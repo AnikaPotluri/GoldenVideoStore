@@ -1,0 +1,60 @@
+package com.package.controller;
+
+import com.package.entity.VideoEntity;
+import com.package.model.VideoRequest;
+import com.package.service.VideoService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/videos")
+public class VideoController {
+
+    private final VideoService videoService;
+
+    public VideoController(VideoService videoService) {
+        this.videoService = videoService;
+    }
+
+    @GetMapping
+    public List<VideoEntity> getAllVideos() {
+        return videoService.getAllVideos();
+    }
+
+    @GetMapping("/available")
+    public List<VideoEntity> getAvailableVideos() {
+        return videoService.getAvailableVideos();
+    }
+
+    @PostMapping("/add/movie")
+    public ResponseEntity<VideoEntity> addMovie(@RequestBody VideoRequest request) {
+        VideoEntity movie = videoService.addMovie(request);
+        return ResponseEntity.ok(movie);
+    }
+
+    @PutMapping("/{title}/rent")
+    public ResponseEntity<String> rentVideo(@PathVariable String title) {
+        boolean ok = videoService.rentVideo(title);
+        if (ok) {
+            return ResponseEntity.ok("Video rented: " + title);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{title}/return")
+    public ResponseEntity<String> returnVideo(@PathVariable String title) {
+        boolean ok = videoService.returnVideo(title);
+        if (ok) {
+            return ResponseEntity.ok("Video returned: " + title);
+        }
+        return ResponseEntity.notFound().build();
+    }
+}
